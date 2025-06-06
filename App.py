@@ -24,46 +24,121 @@ st.markdown(
 
 escenario = st.selectbox(
     "Selecciona escenario",
-    ["Ninguno", "Ejemplo Básico"]
+    ["Ninguno", "Ejemplo Completo"]
 )
 
-def crear_poligonos_ejemplo():
-    return pd.DataFrame([
-        {"Polígono": 1, "X": 0,  "Y": 0},
-        {"Polígono": 2, "X": 40, "Y": 20},
-        {"Polígono": 3, "X": 25, "Y": 35},
-        {"Polígono": 18,"X": 30, "Y": 60}
+# ------------------------------------------------------------
+# 2) FUNCIONES PARA CREAR EL ESCENARIO COMPLETO
+# ------------------------------------------------------------
+
+def crear_poligonos_completo():
+    # IDs dados: 1, 3, 4, 5, 20, 23, 24, 18, 17, 16, 19, 25, 26
+    # Coordenadas arbitrarias para cada polígono (puedes ajustar si tienes datos reales)
+    coords = {
+        1:  ( 0,  0),
+        3:  (10,  0),
+        4:  (20,  0),
+        5:  (30,  0),
+        20: ( 0, 10),
+        23: (10, 10),
+        24: (20, 10),
+        19: (40, 10),
+        25: (50, 10),
+        26: (60, 10),
+        18: (20, 20),
+        17: (30, 20),
+        16: (40, 20),
+
+    }
+    df = pd.DataFrame([
+        {"Polígono": pid, "X": x, "Y": y}
+        for pid, (x, y) in coords.items()
+    ])
+    return df
+
+def crear_demandas_completo():
+    # Hectáreas por polígono
+    hectareas = {
+        1:  5.40,
+        3:  8.00,
+        4:  8.00,
+        5:  7.56,
+        20: 1.38,
+        23: 5.53,
+        24: 5.64,
+        18: 7.11,
+        17: 6.11,
+        16: 5.64,
+        19: 4.92,
+        25: 5.05,
+        26: 4.75,
+    }
+    # Densidad por hectárea (unidades/ha) de cada especie
+    densidad = {
+        "Lechugilla":            33,
+        "Maguey Verde Salmiana": 157,
+        "Maguey azul":           33,
+        "Maguey Verde Striata":  33,
+        "Cuijo cantabriginesis":  39,
+        "Cuijo engelmani":       30,
+        "Tapón":                 58,
+        "Cardón":                51,
+        "Mezquite":              69,
+        "palma china":           21
+    }
+
+    filas = []
+    for pid, ha in hectareas.items():
+        for esp, d in densidad.items():
+            demanda_unidades = int(round(ha * d))
+            filas.append({
+                "Especie":   esp,
+                "Polígono":  pid,
+                "Demanda":   demanda_unidades
+            })
+    df = pd.DataFrame(filas)
+    return df
+
+def crear_proveedores_completo():
+    # Cada proveedor y las especies que ofrece con su costo; max_oferta = 10000 (genérico)
+    filas = []
+    # Vivero: Mezquite a 26.5, palma china a 26
+    filas.extend([
+        {"Proveedor": "Vivero", "Especie": "Mezquite",    "Costo": 26.5, "Max_oferta": 10000},
+        {"Proveedor": "Vivero", "Especie": "palma china", "Costo": 26.0, "Max_oferta": 10000},
+    ])
+    # Moctezuma: Maguey azul y Maguey Verde Striata a 26; Cuijo cantabriginesis y Tapón a 17
+    filas.extend([
+        {"Proveedor": "Moctezuma", "Especie": "Maguey azul",            "Costo": 26.0, "Max_oferta": 10000},
+        {"Proveedor": "Moctezuma", "Especie": "Maguey Verde Striata",   "Costo": 26.0, "Max_oferta": 10000},
+        {"Proveedor": "Moctezuma", "Especie": "Cuijo cantabriginesis",  "Costo": 17.0, "Max_oferta": 10000},
+        {"Proveedor": "Moctezuma", "Especie": "Tapón",                  "Costo": 17.0, "Max_oferta": 10000},
+    ])
+    # Venado: Maguey Verde Striata a 25; Cuijo cantabriginesis, Cuijo engelmani, Tapón, Cardón a 18
+    filas.extend([
+        {"Proveedor": "Venado", "Especie": "Maguey Verde Striata",      "Costo": 25.0, "Max_oferta": 10000},
+        {"Proveedor": "Venado", "Especie": "Cuijo cantabriginesis",      "Costo": 18.0, "Max_oferta": 10000},
+        {"Proveedor": "Venado", "Especie": "Cuijo engelmani",           "Costo": 18.0, "Max_oferta": 10000},
+        {"Proveedor": "Venado", "Especie": "Tapón",                     "Costo": 18.0, "Max_oferta": 10000},
+        {"Proveedor": "Venado", "Especie": "Cardón",                    "Costo": 18.0, "Max_oferta": 10000},
+    ])
+    # Laguna seca: Lechugilla, Maguey Verde Salmiana, Maguey azul a 26; Cuijo engelmani a 21; Tapón a 18
+    filas.extend([
+        {"Proveedor": "Laguna seca", "Especie": "Lechugilla",           "Costo": 26.0, "Max_oferta": 10000},
+        {"Proveedor": "Laguna seca", "Especie": "Maguey Verde Salmiana","Costo": 26.0, "Max_oferta": 10000},
+        {"Proveedor": "Laguna seca", "Especie": "Maguey azul",          "Costo": 26.0, "Max_oferta": 10000},
+        {"Proveedor": "Laguna seca", "Especie": "Cuijo engelmani",      "Costo": 21.0, "Max_oferta": 10000},
+        {"Proveedor": "Laguna seca", "Especie": "Tapón",                "Costo": 18.0, "Max_oferta": 10000},
     ])
 
-def crear_demandas_ejemplo():
-    especies = ["Encino", "Pino", "Cedro"]
-    filas = []
-    for esp in especies:
-        for pid in [1, 2, 3]:
-            filas.append({
-                "Especie": esp,
-                "Polígono": pid,
-                "Demanda": random.randint(5, 20)
-            })
-    return pd.DataFrame(filas)
+    df = pd.DataFrame(filas)
+    return df
 
-def crear_proveedores_ejemplo():
-    especies = ["Encino", "Pino", "Cedro"]
-    filas = []
-    for prov in ["Prov1", "Prov2", "Prov3"]:
-        for esp in especies:
-            filas.append({
-                "Proveedor": prov,
-                "Especie": esp,
-                "Costo": round(random.uniform(4, 12), 2),
-                "Max_oferta": random.randint(10, 30)
-            })
-    return pd.DataFrame(filas)
-
-if escenario == "Ejemplo Básico":
-    inicial_poligonos   = crear_poligonos_ejemplo()
-    inicial_demandas    = crear_demandas_ejemplo()
-    inicial_proveedores = crear_proveedores_ejemplo()
+# Según el escenario, definimos los DataFrames iniciales
+if escenario == "Ejemplo Completo":
+    inicial_poligonos   = crear_poligonos_completo()
+    inicial_demandas    = crear_demandas_completo()
+    inicial_proveedores = crear_proveedores_completo()
 else:
     inicial_poligonos   = pd.DataFrame(columns=["Polígono", "X", "Y"])
     inicial_demandas    = pd.DataFrame(columns=["Especie", "Polígono", "Demanda"])
@@ -71,10 +146,10 @@ else:
 
 
 # ------------------------------------------------------------
-# 2) TABLAS EDITABLES (cada una con key distinta según escenario)
+# 3) TABLAS EDITABLES
 # ------------------------------------------------------------
 
-# Polígonos
+# 3.1 Polígonos
 st.subheader("🗺️ Definir Polígonos (ID, X, Y)")
 key_pol = f"poligonos_{escenario}"
 df_poligonos = st.data_editor(
@@ -92,7 +167,7 @@ try:
 except Exception:
     poligonos_coords = {}
 
-# Demandas
+# 3.2 Demandas
 st.subheader("📈 Definir Demandas (Especie, Polígono, Demanda)")
 key_dem = f"demandas_{escenario}"
 df_demandas = st.data_editor(
@@ -113,7 +188,7 @@ for _, row in df_demandas.iterrows():
         dem = float(row["Demanda"])
         demanda_poligonos.setdefault(esp, {})[pid] = dem
 
-# Proveedores
+# 3.3 Proveedores
 st.subheader("🤝 Definir Proveedores (Proveedor, Especie, Costo, Max_oferta)")
 key_prov = f"proveedores_{escenario}"
 df_proveedores = st.data_editor(
@@ -138,45 +213,45 @@ for _, row in df_proveedores.iterrows():
 
 
 # ------------------------------------------------------------
-# 3) PARÁMETROS LOGÍSTICOS EN EL SIDEBAR
+# 4) PARÁMETROS LOGÍSTICOS EN EL SIDEBAR
 # ------------------------------------------------------------
 
 st.sidebar.header("⚙️ Parámetros de Simulación")
 dias_totales = st.sidebar.number_input(
-    "Días totales", min_value=1, max_value=30, value=5, step=1
+    "Días totales", min_value=1, max_value=1000, value=5, step=1
 )
 aclimatacion_min_dias = st.sidebar.number_input(
     "Días para aclimatación",
     min_value=0,
-    max_value=int(dias_totales / 2),
-    value=1,
+    max_value=5,
+    value=3,  # mínimo de 3 días según PDF
     step=1
 )
 capacidad_camion = st.sidebar.number_input(
-    "Capacidad del camión (unidades)", min_value=1, value=8, step=1
+    "Capacidad del camión (unidades)", min_value=1, value=8000, step=100
 )
 jornada_min = st.sidebar.number_input(
-    "Minutos por jornada", min_value=60, value=300, step=30
+    "Minutos por jornada", min_value=60, value=360, step=30
 )
 espacio_max_almacen = st.sidebar.number_input(
-    "Espacio máximo en almacén (unidades)", min_value=1, value=15, step=1
+    "Espacio máximo en almacén (unidades)", min_value=1, value=4000, step=100
 )
 costo_transporte = st.sidebar.number_input(
-    "Costo transporte por proveedor", min_value=0, value=200, step=50
+    "Costo transporte por viaje", min_value=0, value=4500, step=500
 )
 velocidad = st.sidebar.number_input(
     "Velocidad (km/h)", min_value=1.0, value=60.0, step=1.0
 )
 costo_plantacion = st.sidebar.number_input(
-    "Costo plantación por unidad", min_value=0.0, value=1.0, step=0.5
+    "Costo plantación por unidad", min_value=0.0, value=20.0, step=1.0
 )
 
-# → Nuevos inputs en sidebar: tiempo de carga y descarga
+# Nuevos inputs en sidebar: tiempo de carga y descarga
 tiempo_carga = st.sidebar.number_input(
-    "Tiempo de carga (minutos)", min_value=0, value=1, step=1
+    "Tiempo de carga (minutos)", min_value=0, value=30, step=5
 )
 tiempo_descarga = st.sidebar.number_input(
-    "Tiempo de descarga (minutos)", min_value=0, value=1, step=1
+    "Tiempo de descarga (minutos)", min_value=0, value=30, step=5
 )
 
 # Verificar polígono 18 (almacén)
@@ -186,7 +261,7 @@ if 18 not in poligonos_coords:
 
 
 # ------------------------------------------------------------
-# 4) FUNCIONES DE SIMULACIÓN
+# 5) FUNCIONES DE SIMULACIÓN
 # ------------------------------------------------------------
 
 def tiempo_entre(p1, p2):
@@ -292,60 +367,99 @@ def planificar_rutas(dia, disponibles, demanda_restante):
 
 def procesar_entregas(inventario, entregas, entregado, dia):
     for esp, cantidad in entregado.items():
-        if cantidad > 0:
-            inventario[esp][dia] -= cantidad
+        disponible_hoy = inventario[esp][dia]
+        a_entregar = min(disponible_hoy, cantidad)
+
+        if a_entregar > 0:
+            inventario[esp][dia] -= a_entregar
             entregas.append({
-                "Especie": esp,
-                "Día entrega": dia,
-                "Cantidad": cantidad,
-                "Costo plantación": cantidad * costo_plantacion
+                "Especie":      esp,
+                "Día entrega":  dia,
+                "Cantidad":     a_entregar,
+                "Costo plantación": a_entregar * costo_plantacion
             })
 
 def realizar_compras(inventario, compras, oferta_usada, dia):
-    proveedores_hoja = set()
+    """
+    Compra todas las especies que hagan falta para reponer el inventario,
+    cobrando un solo costo de transporte por día, y asegurándose de que
+    el espacio en almacén (espacio_max_almacen) se trate como un total agregado.
+    """
+    # 1) Flag para cobrar transporte solo una vez por día
+    transporte_cobrado = False
+
+    # 2) Calculamos cuánto hay en total en inventario en el día 'dia'
+    total_en_almacen = sum(inventario[esp][dia] for esp in inventario)
+    espacio_libre_total = espacio_max_almacen - total_en_almacen
+    # Si ya está lleno o no hay espacio, no compramos nada:
+    if espacio_libre_total <= 0:
+        return
+
+    # 3) Iteramos especie por especie para reponer demanda
     for esp in demanda_poligonos:
+        # Ya no alcanzaría a llegar (si no cabe en almacén para aclimatar):
         if dia + aclimatacion_min_dias >= dias_totales:
             continue
 
+        # Demanda total de esta especie (sobre todos los polígonos)
         total_dem = sum(demanda_poligonos[esp].values())
+        # Cuánto ya se compró de esta especie (sumamos en 'compras')
         total_cmp = sum(c["Cantidad"] for c in compras if c["Especie"] == esp)
         restante = total_dem - total_cmp
 
-        espacio_disp = espacio_max_almacen - inventario[esp][dia]
-        max_posible = min(restante, espacio_disp)
-        if max_posible <= 0:
+        if restante <= 0:
             continue
 
+        # Ahora el espacio disponible para esta especie es
+        # el "espacio_libre_total", no un valor por especie.
+        if espacio_libre_total <= 0:
+            break  # ya no cabe nada más en almacén
+
+        max_posible = min(restante, espacio_libre_total)
+
+        # Recolectamos las ofertas disponibles de proveedores para esta especie
         opciones = []
         for p, datos in demandas_oferta.items():
             info = datos.get(esp)
             if info:
-                disponible_prov = info["max_oferta"] - oferta_usada[p][esp]
-                if disponible_prov > 0:
-                    opciones.append((p, info["costo"], disponible_prov))
-        opciones.sort(key=lambda x: x[1])
+                dispo = info["max_oferta"] - oferta_usada[p][esp]
+                if dispo > 0:
+                    opciones.append((p, info["costo"], dispo))
+        opciones.sort(key=lambda x: x[1])  # orden por costo ascendente
 
         restante_a_comprar = max_posible
-        for p_sel, costo, dispo in opciones:
-            if restante_a_comprar <= 0:
+        for p_sel, costo_unit, dispo in opciones:
+            if restante_a_comprar <= 0 or espacio_libre_total <= 0:
                 break
-            cantidad = min(dispo, restante_a_comprar)
-            costo_trans = costo_transporte if p_sel not in proveedores_hoja else 0
+            cantidad = min(dispo, restante_a_comprar, espacio_libre_total)
+
+            # 4) Cobro único de transporte por día:
+            costo_trans = 0
+            if not transporte_cobrado:
+                costo_trans = costo_transporte
+                transporte_cobrado = True
 
             compras.append({
-                "Especie": esp,
-                "Día pedido": dia,
-                "Proveedor": p_sel,
-                "Cantidad": cantidad,
-                "Costo compra": cantidad * costo,
+                "Especie":          esp,
+                "Día pedido":       dia,
+                "Proveedor":        p_sel,
+                "Cantidad":         cantidad,
+                "Costo compra":     cantidad * costo_unit,
                 "Costo transporte": costo_trans
             })
-            proveedores_hoja.add(p_sel)
+
+            # Actualizamos oferta usada y espacio en almacén para este día + 1
             oferta_usada[p_sel][esp] += cantidad
             inventario[esp][dia + 1] += cantidad
 
+            # Reducimos el espacio libre total
+            espacio_libre_total -= cantidad
             restante_a_comprar -= cantidad
-            espacio_disp -= cantidad
+
+            # Si se acabó el espacio, salimos de ambos bucles
+            if espacio_libre_total <= 0:
+                break
+
 
 def simular():
     inventario = {esp: [0] * (dias_totales + 1) for esp in demanda_poligonos}
@@ -382,9 +496,8 @@ def simular():
     return df_inventario, df_compras, df_entregas, df_rutas
 
 # ------------------------------------------------------------
-# 8) EJECUCIÓN DE SIMULACIÓN Y RESULTADOS
+# 6) EJECUCIÓN DE SIMULACIÓN Y RESULTADOS
 # ------------------------------------------------------------
-
 if st.button("🔄 Ejecutar simulación"):
     if len(demanda_poligonos) == 0:
         st.error("❗ Debes definir al menos una demanda en la tabla de Demandas.")
@@ -394,7 +507,7 @@ if st.button("🔄 Ejecutar simulación"):
         st.success("✅ ¡Simulación completada!")
 
         # ------------------------------------------------------------
-        # 9) KPIs CON TARJETAS GRANDES (st.metric)
+        # 7) KPIs CON TARJETAS GRANDES (st.metric)
         # ------------------------------------------------------------
         num_viajes = len(df_rutas)
         if num_viajes == 0:
@@ -425,7 +538,7 @@ if st.button("🔄 Ejecutar simulación"):
         )
 
         # ------------------------------------------------------------
-        # 10) RESULTADOS TABULARES
+        # 8) RESULTADOS TABULARES
         # ------------------------------------------------------------
         st.subheader("📊 Inventario Diario")
         st.dataframe(df_inventario, use_container_width=True)
