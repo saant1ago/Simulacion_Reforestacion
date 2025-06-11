@@ -218,7 +218,7 @@ for _, row in df_proveedores.iterrows():
 
 st.sidebar.header("⚙️ Parámetros de Simulación")
 dias_totales = st.sidebar.number_input(
-    "Días totales", min_value=1, max_value=1000, value=5, step=1
+    "Días totales", min_value=1, max_value=1000, value=30, step=1
 )
 aclimatacion_min_dias = st.sidebar.number_input(
     "Días para aclimatación",
@@ -228,13 +228,13 @@ aclimatacion_min_dias = st.sidebar.number_input(
     step=1
 )
 capacidad_camion = st.sidebar.number_input(
-    "Capacidad del camión (unidades)", min_value=1, value=8000, step=100
+    "Capacidad del camión (unidades)", min_value=1, value=535, step=100
 )
 jornada_min = st.sidebar.number_input(
     "Minutos por jornada", min_value=60, value=360, step=30
 )
 espacio_max_almacen = st.sidebar.number_input(
-    "Espacio máximo en almacén (unidades)", min_value=1, value=4000, step=100
+    "Espacio máximo en almacén (unidades)", min_value=1, value=1000, step=100
 )
 costo_transporte = st.sidebar.number_input(
     "Costo transporte por viaje", min_value=0, value=4500, step=500
