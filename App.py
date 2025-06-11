@@ -536,6 +536,55 @@ if st.button("🔄 Ejecutar simulación"):
             label="💰 Costo total",
             value=f"${costo_total:.2f}"
         )
+                # … después de tus k1.metric, k2.metric, k3.metric …
+
+        # ------------------------------------------------------------
+        # → NUEVAS MÉTRICAS DE EFICIENCIA
+        # ------------------------------------------------------------
+        # 1) Unidades demandadas totales
+        total_demandadas = sum(
+            d for esp in demanda_poligonos 
+            for d in demanda_poligonos[esp].values()
+        )
+
+        # 2) Unidades efectivamente entregadas
+        total_entregadas = df_entregas["Cantidad"].sum() if not df_entregas.empty else 0
+
+        # Fill Rate
+        fill_rate = (total_entregadas / total_demandadas * 100) if total_demandadas > 0 else 0
+
+        # Utilización media de camión
+        if len(df_rutas) > 0:
+            utilizaciones = df_rutas["Unidades"] / capacidad_camion
+            util_media = utilizaciones.mean() * 100
+        else:
+            util_media = 0
+
+        # Costo unitario
+        coste_unitario = (costo_total / total_entregadas) if total_entregadas > 0 else 0
+
+        # Mostrar con st.metric
+        um1, um2, um3, um4 = st.columns(4)
+        um1.metric(
+            label="📦 Fill Rate",
+            value=f"{fill_rate:.1f}%",
+            delta=f"{total_entregadas}/{total_demandadas}"
+        )
+        um2.metric(
+            label="🚚 Utilización media",
+            value=f"{util_media:.1f}%",
+            delta=f"Camión cap. {capacidad_camion}"
+        )
+        um3.metric(
+            label="💲 Costo unidad",
+            value=f"${coste_unitario:,.2f}",
+            delta="promedio"
+        )
+        um4.metric(
+            label="📊 Unidades entregadas",
+            value=f"{total_entregadas}"
+        )
+
 
         # ------------------------------------------------------------
         # 8) RESULTADOS TABULARES
